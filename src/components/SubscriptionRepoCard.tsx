@@ -1,3 +1,5 @@
+import { getIntlLocale } from '../i18n/format';
+import { useT } from "../i18n/useT";
 import React, { useState, useMemo, useCallback } from 'react';
 import { Star, StarOff, ExternalLink, Bot, GitFork, Sparkles, BookOpen, AlertTriangle, FileText, Calendar } from 'lucide-react';
 import { getPlatformIcon as getSharedPlatformIcon } from './platformMeta';
@@ -24,7 +26,7 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
   const language = useAppStore(state => state.language);
   const githubToken = useAppStore(state => state.githubToken);
 
-  const t = useCallback((zh: string, en: string) => language === 'zh' ? zh : en, [language]);
+  const t = useT('releases');
 
   const { analyze, star, executeUnstar, isAnalyzing, isStarring, isStarred } =
     useDiscoveryRepoActions({ repo });
@@ -129,10 +131,10 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
   const weeklyIssueNumberLabel = weeklyIssueLabels.find(label => /^issue-\d+$/i.test(label));
   const weeklyIssueNumber = weeklyIssueNumberLabel ? Number(weeklyIssueNumberLabel.replace(/^\D+/i, '')) : null;
   const weeklySubmittedDate = repo.weeklyIssue?.createdAt && Number.isFinite(Date.parse(repo.weeklyIssue.createdAt))
-    ? new Date(repo.weeklyIssue.createdAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')
+    ? new Date(repo.weeklyIssue.createdAt).toLocaleDateString(getIntlLocale(language))
     : '';
   const tweetDate = repo.xTweet?.createdAt && Number.isFinite(Date.parse(repo.xTweet.createdAt))
-    ? new Date(repo.xTweet.createdAt).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US')
+    ? new Date(repo.xTweet.createdAt).toLocaleDateString(getIntlLocale(language))
     : '';
 
   const cardTitle = repo.full_name || `${repo.owner?.login || ''}/${repo.name || ''}`;
@@ -178,16 +180,8 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
                 onClick={handleAnalyze}
                 disabled={!githubToken || isAnalyzing}
                 className="flex h-11 w-11 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed sm:h-8 sm:w-8"
-                aria-label={
-                  isAnalyzed ? t('重新分析', 'Re-analyze') : isFailed ? t('重新分析', 'Re-analyze') : t('AI分析', 'AI Analyze')
-                }
-                title={
-                  isAnalyzed 
-                    ? t('重新分析', 'Re-analyze') 
-                    : isFailed 
-                    ? t('重新分析', 'Re-analyze')
-                    : t('AI分析', 'AI Analyze')
-                }
+                aria-label={isAnalyzed || isFailed ? t('subscriptionRepoCard.re-analyze') : t('subscriptionRepoCard.ai-analyze')}
+                title={isAnalyzed || isFailed ? t('subscriptionRepoCard.re-analyze') : t('subscriptionRepoCard.ai-analyze')}
               >
                 {isAnalyzing ? (
                   <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -203,8 +197,8 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
                 size="icon"
                 onClick={handleOpenInZRead}
                 className="flex h-11 w-11 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:h-8 sm:w-8"
-                aria-label={t('在ZRead打开', 'Open in ZRead')}
-                title={t('在ZRead打开', 'Open in ZRead')}
+                aria-label={t('subscriptionRepoCard.open-in-zread')}
+                title={t('subscriptionRepoCard.open-in-zread')}
               >
                 <BookOpen className="w-4 h-4" />
               </Button>
@@ -216,8 +210,8 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
                     size="icon"
                     onClick={handleOpenTelegramMessage}
                     className="flex h-11 w-11 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:h-8 sm:w-8"
-                    aria-label={t('查看频道消息原文', 'View original channel message')}
-                    title={t('查看频道消息原文', 'View original channel message')}
+                    aria-label={t('subscriptionRepoCard.view-original-channel-message')}
+                    title={t('subscriptionRepoCard.view-original-channel-message')}
                   >
                     <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
@@ -226,8 +220,8 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
                     size="icon"
                     onClick={handleOpenTweet}
                     className="flex h-11 w-11 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:h-8 sm:w-8"
-                    aria-label={t('查看原贴', 'View original post')}
-                    title={t('查看原贴', 'View original post')}
+                    aria-label={t('subscriptionRepoCard.view-original-post')}
+                    title={t('subscriptionRepoCard.view-original-post')}
                   >
                     <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
@@ -236,8 +230,8 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
                     size="icon"
                     onClick={handleOpenIssue}
                     className="flex h-11 w-11 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:h-8 sm:w-8"
-                    aria-label={t('查看原贴', 'View original post')}
-                    title={t('查看原贴', 'View original post')}
+                    aria-label={t('subscriptionRepoCard.view-original-post')}
+                    title={t('subscriptionRepoCard.view-original-post')}
                   >
                     <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
@@ -251,8 +245,8 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
                 rel="noopener noreferrer"
                 onClick={(event) => event.stopPropagation()}
                 className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:h-8 sm:w-8"
-                aria-label={t('在GitHub打开', 'Open on GitHub')}
-                title={t('在GitHub打开', 'Open on GitHub')}
+                aria-label={t('subscriptionRepoCard.open-on-github')}
+                title={t('subscriptionRepoCard.open-on-github')}
               >
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -267,8 +261,8 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
                     ? 'bg-primary text-primary-foreground shadow-sm dark:bg-primary/80 dark:text-primary-foreground'
                     : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
-                aria-label={isStarred ? t('取消Star', 'Unstar') : t('添加Star', 'Add Star')}
-                title={isStarred ? t('取消Star', 'Unstar') : t('添加Star', 'Add Star')}
+                aria-label={isStarred ? t('subscriptionRepoCard.unstar') : t('subscriptionRepoCard.add-star')}
+                title={isStarred ? t('subscriptionRepoCard.unstar') : t('subscriptionRepoCard.add-star')}
               >
                 {isStarring ? (
                   <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -353,12 +347,12 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
                 <>
                   {isWeeklyCollected && (
                     <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary dark:text-primary">
-                      {t('周刊收录', 'In Weekly')}
+                      {t('subscriptionRepoCard.in-weekly')}
                     </span>
                   )}
                   {weeklyIssueNumber != null && (
                     <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground dark:text-muted-foreground">
-                      {t(`第 ${weeklyIssueNumber} 期`, `Issue #${weeklyIssueNumber}`)}
+                      {t('subscriptionRepoCard.issue-weeklyissuenumber', { weeklyIssueNumber: weeklyIssueNumber })}
                     </span>
                   )}
                 </>
@@ -378,7 +372,7 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
           {repo.ai_platforms && repo.ai_platforms.length > 0 && (
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xs text-muted-foreground dark:text-muted-foreground">
-                {t('平台:', 'Platforms:')}
+                {t('subscriptionRepoCard.platforms')}
               </span>
               <div className="flex items-center gap-1">
                 {repo.ai_platforms.slice(0, 5).map((platform) => (
@@ -426,16 +420,14 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
       onClose={() => {
         setUnstarConfirmOpen(false);
       }}
-      title={t('确认取消 Star', 'Confirm Unstar')}
+      title={t('subscriptionRepoCard.confirm-unstar')}
       maxWidth="max-w-sm"
     >
       <div className="min-w-0 space-y-4">
         <div className="flex min-w-0 items-center gap-3 text-muted-foreground dark:text-muted-foreground ">
           <AlertTriangle className="w-8 h-8 flex-shrink-0" />
           <p className="break-words text-sm text-muted-foreground dark:text-muted-foreground">
-            {language === 'zh' 
-              ? `确定要取消 Star "${repo.full_name}" 吗？这将会从您的 GitHub 收藏中移除该仓库。`
-              : `Are you sure you want to unstar "${repo.full_name}"? This will remove the repository from your GitHub stars.`}
+            {t('subscriptionRepoCard.are-you-sure-you-want-to-unstar-v1-this-will-rem', { v1: repo.full_name })}
           </p>
         </div>
         <div className="flex flex-wrap gap-3 justify-end">
@@ -446,7 +438,7 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
             variant="ghost"
             className="h-11 px-4 text-sm font-medium text-muted-foreground dark:text-muted-foreground hover:bg-muted dark:hover:bg-accent transition-colors sm:h-9"
           >
-            {t('取消', 'Cancel')}
+            {t('subscriptionRepoCard.cancel')}
           </Button>
           <Button
             type="button"
@@ -454,7 +446,7 @@ export const SubscriptionRepoCard: React.FC<SubscriptionRepoCardProps> = ({ repo
             onClick={confirmUnstar}
             className="h-11 rounded-lg px-4 text-sm font-medium sm:h-9"
           >
-            {t('确认取消', 'Confirm Unstar')}
+            {t('subscriptionRepoCard.confirm-unstar-2')}
           </Button>
         </div>
       </div>

@@ -1,3 +1,8 @@
+
+
+
+
+import { makeT, makeTPair } from '../i18n/useT';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -18,22 +23,19 @@ const categoryIcons = {
   mine: User,
 };
 
-const sortOptions = [
-  { value: 'updated', labelZh: '按更新时间', labelEn: 'Updated' },
-  { value: 'created', labelZh: '按创建时间', labelEn: 'Created' },
-  { value: 'name', labelZh: '按名称', labelEn: 'Name' },
-  { value: 'files', labelZh: '按文件数', labelEn: 'Files' },
-] as const;
+const sortOptions = ['updated', 'created', 'name', 'files'] as const;
+const gistCategories: GistCategoryId[] = ['all', 'starred', 'mine'];
 
 export const GistView: React.FC = () => {
   const {
     user,
+    language,
     gists,
     starredGists,
     gistSearchFilters,
     gistSearchResults,
     selectedGistCategory,
-    language,
+
     setGistSearchFilters,
     setGistSearchResults,
     setSelectedGistCategory,
@@ -47,7 +49,8 @@ export const GistView: React.FC = () => {
     fetchGistDetail,
     submitGist,
   } = useGistActions();
-  const t = (zh: string, en: string) => language === 'zh' ? zh : en;
+  const t = useMemo(() => makeT(language, 'gists'), [language]);
+  const tPair = useMemo(() => makeTPair(language), [language]);
   const [query, setQuery] = useState(gistSearchFilters.query);
   const [detailGist, setDetailGist] = useState<Gist | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -73,12 +76,6 @@ export const GistView: React.FC = () => {
     }
     setGistSearchResults(filterAndSortGists(currentCategoryItems, gistSearchFilters));
   }, [currentCategoryItems, gistSearchFilters, setGistSearchResults]);
-
-  const categories: Array<{ id: GistCategoryId; name: string; nameEn: string }> = [
-    { id: 'all', name: '全部gist', nameEn: 'All gists' },
-    { id: 'starred', name: '星标gist', nameEn: 'Starred gists' },
-    { id: 'mine', name: '我的gist', nameEn: 'My gists' },
-  ];
 
   const basicSearch = () => {
     setGistSearchFilters({ query });
@@ -112,19 +109,16 @@ export const GistView: React.FC = () => {
               <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Gist</h2>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button type="button" variant="ghost" size="icon" aria-label={t('Gist 权限帮助', 'Gist permission help')} className="h-11 w-11 p-0 text-muted-foreground sm:h-7 sm:w-7">
+                  <Button type="button" variant="ghost" size="icon" aria-label={tPair('Gist 权限帮助', 'Gist permission help')} className="h-11 w-11 p-0 text-muted-foreground sm:h-7 sm:w-7">
                     <HelpCircle className="h-3.5 w-3.5" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent side="bottom" align="start" collisionPadding={16} className="w-[calc(100vw-2rem)] max-w-xs break-words p-3 text-xs text-muted-foreground dark:text-muted-foreground">
                   <p className="mb-1 font-medium text-foreground dark:text-foreground">
-                    {t('访问 Gist 需要 gist 权限', 'Gist access requires the gist scope')}
+                    {t('gistView.gist-access-requires-the-gist-scope')}
                   </p>
                   <p className="leading-relaxed">
-                    {t(
-                      '若私有 gist 未拉取到，或无法新建/编辑/删除 gist，请到 GitHub → Settings → Developer settings → Personal access tokens 中确认当前 token 已勾选 gist 权限。修改权限后请重新输入 token 登录。',
-                      'If your private gists are missing, or you cannot create/edit/delete gists, go to GitHub → Settings → Developer settings → Personal access tokens and make sure the gist scope is checked for your current token. Re-login with the updated token after changing scopes.'
-                    )}
+                    {t('gistView.if-your-private-gists-are-missing-or-you-cannot')}
                   </p>
                 </PopoverContent>
               </Popover>
@@ -132,15 +126,15 @@ export const GistView: React.FC = () => {
           </div>
           <div data-testid="gist-category-strip" className="max-w-full overflow-x-auto touch-pan-x lg:overflow-visible">
             <div className="flex w-max gap-1 lg:block lg:w-auto lg:space-y-1">
-            {categories.map(category => {
-              const Icon = categoryIcons[category.id];
-              const active = selectedGistCategory === category.id;
+            {gistCategories.map(categoryId => {
+              const Icon = categoryIcons[categoryId];
+              const active = selectedGistCategory === categoryId;
               return (
                 <Button
-                  key={category.id}
+                  key={categoryId}
                   type="button"
                   aria-pressed={active}
-                  onClick={() => setSelectedGistCategory(category.id)}
+                  onClick={() => setSelectedGistCategory(categoryId)}
                   variant="ghost"
                   className={`linear-settings-nav-item group flex w-auto shrink-0 items-center justify-between px-3 py-2 text-sm text-muted-foreground hover:text-accent-foreground lg:w-full ${
                     active ? 'is-active' : ''
@@ -148,10 +142,10 @@ export const GistView: React.FC = () => {
                 >
                   <span className="inline-flex items-center gap-2">
                     <Icon className="h-4 w-4" />
-                    {t(category.name, category.nameEn)}
+                    {t(`gistView.category-${categoryId}`)}
                   </span>
                   <span className={`font-medium ${active ? 'text-accent-foreground' : 'text-muted-foreground group-hover:text-accent-foreground'}`}>
-                    {categoryItems[category.id].length}
+                    {categoryItems[categoryId].length}
                   </span>
                 </Button>
               );
@@ -173,9 +167,9 @@ export const GistView: React.FC = () => {
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' && !event.nativeEvent.isComposing) basicSearch();
                   }}
-                  aria-label={t('搜索 gist、文件名或摘要', 'Search gists, filenames, or summaries')}
+                  aria-label={t('gistView.search-gists-filenames-or-summaries')}
                   className="ui-field h-11 w-full py-2 pl-9 pr-9 text-base text-foreground dark:text-foreground sm:h-10 sm:text-sm"
-                  placeholder={t('搜索 gist、文件名、摘要…', 'Search gists, filenames, summaries…')}
+                  placeholder={t('gistView.search-gists-filenames-summaries')}
                 />
                 {query && (
                   <Button
@@ -186,8 +180,8 @@ export const GistView: React.FC = () => {
                       setQuery('');
                       setGistSearchFilters({ query: '' });
                     }}
-                    aria-label={t('清除搜索', 'Clear search')}
-                    title={t('清除搜索', 'Clear search')}
+                    aria-label={t('gistView.clear-search')}
+                    title={t('gistView.clear-search')}
                     className="absolute right-0 top-1/2 h-11 w-11 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-muted-foreground sm:right-2 sm:h-7 sm:w-7 dark:hover:text-foreground"
                   >
                     <X className="h-4 w-4" />
@@ -201,7 +195,7 @@ export const GistView: React.FC = () => {
                 className="ui-button-primary inline-flex min-h-11 items-center gap-2 px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-9"
               >
                 {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
-                {t('AI搜索', 'AI search')}
+                {t('gistView.ai-search')}
               </Button>
             </div>
 
@@ -209,18 +203,18 @@ export const GistView: React.FC = () => {
               <Select
                 value={gistSearchFilters.sortBy}
                 onValueChange={(value) => {
-                  if (sortOptions.some((option) => option.value === value)) {
-                    setGistSearchFilters({ sortBy: value as typeof sortOptions[number]['value'] });
+                  if (sortOptions.some((option) => option === value)) {
+                    setGistSearchFilters({ sortBy: value as typeof sortOptions[number] });
                   }
                 }}
               >
-                <SelectTrigger aria-label={t('Gist 排序方式', 'Gist sort order')} className="ui-field h-11 w-40 max-w-full px-3 py-1 text-base sm:h-9 sm:text-sm">
+                <SelectTrigger aria-label={t('gistView.gist-sort-order')} className="ui-field h-11 w-40 max-w-full px-3 py-1 text-base sm:h-9 sm:text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {sortOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {t(option.labelZh, option.labelEn)}
+                    <SelectItem key={option} value={option}>
+                      {t(`gistView.sort-${option}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -231,7 +225,7 @@ export const GistView: React.FC = () => {
                 onClick={() => setGistSearchFilters({ sortOrder: gistSearchFilters.sortOrder === 'desc' ? 'asc' : 'desc' })}
                 className="ui-button min-h-11 px-3 py-2 text-sm sm:min-h-9"
               >
-                {gistSearchFilters.sortOrder === 'desc' ? t('降序', 'Desc') : t('升序', 'Asc')}
+                {gistSearchFilters.sortOrder === 'desc' ? t('gistView.desc') : t('gistView.asc')}
               </Button>
               <Button
                 type="button"
@@ -241,7 +235,7 @@ export const GistView: React.FC = () => {
                 className="ui-button inline-flex min-h-11 items-center gap-2 px-3 py-2 text-sm disabled:opacity-50 sm:min-h-9"
               >
                 {isAnalyzingAll ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
-                {t('AI分析', 'AI analyze')}
+                {t('gistView.ai-analyze')}
               </Button>
               <Button
                 type="button"
@@ -251,7 +245,7 @@ export const GistView: React.FC = () => {
                 className="ui-button inline-flex min-h-11 items-center gap-2 px-3 py-2 text-sm disabled:opacity-50 sm:min-h-9"
               >
                 <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                {t('同步', 'Sync')}
+                {t('gistView.sync')}
               </Button>
               <Button
                 type="button"
@@ -262,15 +256,15 @@ export const GistView: React.FC = () => {
                 className="ui-button-primary inline-flex min-h-11 items-center gap-2 px-3 py-2 text-sm font-medium sm:min-h-9"
               >
                 <Plus className="h-4 w-4" />
-                {t('新建', 'New')}
+                {t('gistView.new')}
               </Button>
             </div>
           </div>
         </div>
 
         <div className="flex items-center justify-between text-sm text-muted-foreground dark:text-muted-foreground">
-          <span>{t(`共 ${gistSearchResults.length} 个 gist`, `${gistSearchResults.length} gists`)}</span>
-          {gistSearchFilters.query && <span>{t('已应用搜索', 'Search applied')}</span>}
+          <span>{t('gistView.v1-gists', { v1: gistSearchResults.length })}</span>
+          {gistSearchFilters.query && <span>{t('gistView.search-applied')}</span>}
         </div>
 
         {gistSearchResults.length > 0 ? (
@@ -294,7 +288,7 @@ export const GistView: React.FC = () => {
           </div>
         ) : (
           <div className="ui-empty-state p-12 text-center">
-            {t('暂无 gist。点击同步获取数据，或新建一个 gist。', 'No gists yet. Sync to fetch data, or create a new gist.')}
+            {t('gistView.no-gists-yet-sync-to-fetch-data-or-create-a-new')}
           </div>
         )}
       </section>
