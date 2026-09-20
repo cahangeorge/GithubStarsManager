@@ -15,10 +15,10 @@ describe('ForkCard mobile layout', () => {
 
     expect(container.querySelector('.p-3 > .flex')).toHaveClass('flex-col', 'md:flex-row');
     expect(screen.getByTestId('fork-card-actions')).toHaveClass('w-full', 'flex-wrap', 'md:w-auto');
-    expect(screen.getByRole('button', { name: 'Hide Workflows' })).toHaveClass('h-11', 'sm:h-8');
-    expect(screen.getByRole('button', { name: 'Update branch' })).toHaveClass('h-11', 'w-11', 'sm:h-7', 'sm:w-7');
-    expect(screen.getByRole('link', { name: 'View on GitHub' })).toHaveClass('inline-flex', 'h-11', 'w-11', 'sm:h-7', 'sm:w-7');
-    expect(screen.getByRole('button', { name: 'Run workflow: a-very-long-workflow-name' })).toHaveClass('h-11', 'w-11', 'sm:h-8', 'sm:w-8');
+    expect(screen.getByRole('button', { name: '隐藏工作流' })).toHaveClass('h-11', 'sm:h-8');
+    expect(screen.getByRole('button', { name: '更新分支' })).toHaveClass('h-11', 'w-11', 'sm:h-7', 'sm:w-7');
+    expect(screen.getByRole('link', { name: '在GitHub上查看' })).toHaveClass('inline-flex', 'h-11', 'w-11', 'sm:h-7', 'sm:w-7');
+    expect(screen.getByTitle('运行工作流')).toHaveClass('h-11', 'w-11', 'sm:h-8', 'sm:w-8');
     expect(screen.getByText('upstream/a-very-long-source-repository-name').closest('a')).toHaveClass('inline-flex', 'min-h-11', 'min-w-0', 'items-center', 'truncate', 'sm:min-h-0');
   });
 });

@@ -27,7 +27,11 @@ vi.mock('../features/discovery/hooks/useDiscoveryActions', () => ({
     discoverySelectedTopic: null, setDiscoverySelectedTopic: vi.fn(), discoveryHasMore: {}, discoveryNextPage: {},
     discoveryTotalCount: {}, trendingTimeRange: 'daily', setTrendingTimeRange: vi.fn(), weeklyOnlyCollected: false,
     setWeeklyOnlyCollected: vi.fn(), weeklySyncStatus: null, xTweetFollows: [], xTweetAuth: null, xTweetAuthRevision: 0,
-    xTweetSyncStatus: null, telegramFollows: [], telegramSyncStatus: null, t: (_zh: string, en: string) => en,
+    xTweetSyncStatus: null, telegramFollows: [], telegramSyncStatus: null,
+    t: (key: string) => ({
+      'discoveryView.search-repositories': 'Search repositories',
+      'discoveryView.refresh': 'Refresh',
+    })[key] ?? key,
     isAnalyzing: false, refreshChannel, handleAnalyzePage: vi.fn(), handleAbortAnalysis: vi.fn(),
   }),
 }));
@@ -54,7 +58,7 @@ describe('DiscoveryView mobile', () => {
 
     const tabs = screen.getByRole('tablist');
     expect(tabs).toHaveClass('overflow-x-auto');
-    expect(screen.getByRole('tab', { name: 'Search' })).toHaveClass('h-11');
+    expect(screen.getByRole('tab', { name: 'Repo Search' })).toHaveClass('h-11');
     expect(screen.getByLabelText('Search repositories')).toHaveClass('h-11', 'text-base');
     expect(screen.getByLabelText('Refresh')).toHaveClass('h-11', 'w-11');
 
