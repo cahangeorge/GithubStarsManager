@@ -1,3 +1,5 @@
+
+import { TranslateFn } from '../../i18n/useT';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -26,7 +28,7 @@ import { useDialog } from '../../hooks/useDialog';
 import { useVectorSearchActions } from '../../features/settings/hooks/useVectorSearchActions';
 
 interface VectorSearchSettingsProps {
-  t: (zh: string, en: string) => string;
+  t: TranslateFn;
 }
 
 const EMBEDDING_API_TYPES: { value: EmbeddingApiType; label: string; labelEn: string }[] = [
@@ -147,13 +149,10 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         </div>
         <div className="min-w-0">
           <h2 className="text-lg font-semibold text-foreground dark:text-foreground">
-            {t('向量语义搜索', 'Vector Semantic Search')}
+            {t('vectorSearchSettings.vector-semantic-search')}
           </h2>
           <p className="text-sm text-muted-foreground dark:text-muted-foreground">
-            {t(
-              '基于 Cloudflare Vectorize 的语义搜索，能理解自然语言意图，找到语义相关而非仅关键词匹配的仓库。',
-              'Semantic search powered by Cloudflare Vectorize. Understands natural language intent to find semantically related repositories.'
-            )}
+            {t('vectorSearchSettings.semantic-search-powered-by-cloudflare-vectorize')}
           </p>
         </div>
       </div>
@@ -162,16 +161,16 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
       <div className="flex min-w-0 flex-col gap-3 p-4 bg-accent/50 dark:bg-card/50 rounded-lg sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="font-medium text-foreground dark:text-foreground">
-            {t('启用向量搜索', 'Enable Vector Search')}
+            {t('vectorSearchSettings.enable-vector-search')}
           </div>
           <div className="text-sm text-muted-foreground dark:text-muted-foreground">
-            {t('启用后，AI 搜索将优先走向量检索，失败时自动回退', 'When enabled, AI search will use vector retrieval first, with automatic fallback on failure')}
+            {t('vectorSearchSettings.when-enabled-ai-search-will-use-vector-retrieval')}
           </div>
         </div>
         <Switch
           checked={vectorSearchConfig.enabled}
           onCheckedChange={(enabled) => setVectorSearchConfig({ enabled })}
-          aria-label={t('启用向量搜索', 'Enable Vector Search')}
+          aria-label={t('vectorSearchSettings.enable-vector-search')}
           className="shrink-0"
         />
       </div>
@@ -180,13 +179,13 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
       <div className="border border-border rounded-lg p-4 space-y-4">
         <h3 className="font-medium text-foreground dark:text-foreground flex items-center gap-2">
           <span className="text-xs bg-accent dark:bg-muted px-2 py-0.5 rounded">①</span>
-          {t('Embedding 模型配置', 'Embedding Model Configuration')}
+          {t('vectorSearchSettings.embedding-model-configuration')}
         </h3>
 
         {/* API Type */}
         <div>
           <h4 id="embedding-model-source-label" className="mb-1.5 block text-sm font-medium text-muted-foreground dark:text-muted-foreground">
-            {t('模型来源', 'Model Source')}
+            {t('vectorSearchSettings.model-source')}
           </h4>
           <div role="group" aria-labelledby="embedding-model-source-label" className="flex flex-wrap gap-2">
             {EMBEDDING_API_TYPES.map((type) => (
@@ -205,7 +204,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
                     : 'bg-muted dark:bg-card text-muted-foreground dark:text-muted-foreground hover:bg-accent dark:hover:bg-accent'
                 }`}
               >
-                {t(type.label, type.labelEn)}
+                {t(`vectorSearchSettings.api-type-${type.value}`)}
               </Button>
             ))}
           </div>
@@ -214,7 +213,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         {/* Base URL */}
         <div>
           <label htmlFor="embedding-api-url" className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground mb-1.5">
-            {t('API 地址', 'API URL')}
+            {t('vectorSearchSettings.api-url')}
           </label>
           <Input
             id="embedding-api-url"
@@ -249,13 +248,13 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
               type={showApiKey ? 'text' : 'password'}
               value={formApiKey}
               onChange={(e) => setFormApiKey(e.target.value)}
-              placeholder={formApiType === 'ollama' ? t('可留空', 'Optional') : 'sk-xxx'}
+              placeholder={formApiType === 'ollama' ? t('vectorSearchSettings.optional') : 'sk-xxx'}
               className="w-full px-3 py-2 pr-12 text-base sm:pr-10 sm:text-sm border border-input rounded-md bg-card dark:bg-card text-foreground dark:text-foreground focus:ring-2 focus:ring-ring focus:border-transparent"
             />
             <Button
               type="button"
               variant="ghost"
-              aria-label={showApiKey ? t('隐藏 API Key', 'Hide API key') : t('显示 API Key', 'Show API key')}
+              aria-label={showApiKey ? t('vectorSearchSettings.hide-api-key') : t('vectorSearchSettings.show-api-key')}
               onClick={() => setShowApiKey(!showApiKey)}
               className="absolute right-1 top-1/2 h-11 w-11 -translate-y-1/2 p-0 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground sm:right-2 sm:h-8 sm:w-8"
             >
@@ -264,7 +263,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
           </div>
           {formApiType === 'ollama' && (
             <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">
-              {t('Ollama 本地模型可留空', 'Ollama local models can leave this empty')}
+              {t('vectorSearchSettings.ollama-local-models-can-leave-this-empty')}
             </p>
           )}
         </div>
@@ -272,7 +271,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         {/* Model Name */}
         <div>
           <label htmlFor="embedding-model" className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground mb-1.5">
-            {t('模型名称', 'Model Name')}
+            {t('vectorSearchSettings.model-name')}
           </label>
           <Input
             id="embedding-model"
@@ -295,7 +294,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         {/* Dimensions */}
         <div>
           <label htmlFor="embedding-dimensions" className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground mb-1.5">
-            {t('向量维度', 'Vector Dimensions')}
+            {t('vectorSearchSettings.vector-dimensions')}
           </label>
           <div className="flex flex-col gap-2 sm:flex-row">
             <NumberInput
@@ -322,11 +321,11 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
               }}
               className="h-11 w-full px-3 py-2 text-sm bg-muted dark:bg-card text-muted-foreground dark:text-muted-foreground rounded-md hover:bg-accent dark:hover:bg-accent sm:h-9 sm:w-auto"
             >
-              {t('自动检测', 'Auto Detect')}
+              {t('vectorSearchSettings.auto-detect')}
             </Button>
           </div>
           <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-            {t('必须与 Vectorize 索引维度一致', 'Must match Vectorize index dimensions')}
+            {t('vectorSearchSettings.must-match-vectorize-index-dimensions')}
           </p>
         </div>
 
@@ -338,14 +337,14 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             className="w-full sm:w-auto flex items-center gap-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {testingEmbedding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-            {t('测试 Embedding 连接', 'Test Embedding Connection')}
+            {t('vectorSearchSettings.test-embedding-connection')}
           </Button>
           <Button
             onClick={handleSaveEmbeddingConfig}
             variant={embeddingSaved ? 'default' : 'outline'}
             className="h-11 w-full px-4 text-sm sm:h-9 sm:w-auto"
           >
-            {embeddingSaved ? `✓ ${t('已保存', 'Saved')}` : t('保存配置', 'Save Config')}
+            {embeddingSaved ? `✓ ${t('vectorSearchSettings.saved')}` : t('vectorSearchSettings.save-config')}
           </Button>
         </div>
 
@@ -355,8 +354,8 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             {embeddingTestResult.success ? <CheckCircle className="h-4 w-4" aria-hidden="true" /> : <XCircle className="h-4 w-4" aria-hidden="true" />}
             <AlertDescription>
               {embeddingTestResult.success
-                ? `${t('连接成功', 'Connection successful')} — ${t('维度', 'Dimensions')}: ${embeddingTestResult.dimensions}`
-                : `${t('连接失败', 'Connection failed')}: ${embeddingTestResult.error}`}
+                ? t('vectorSearchSettings.connection-successful-dimensions', { dimensions: embeddingTestResult.dimensions })
+                : t('vectorSearchSettings.connection-failed-detail', { error: embeddingTestResult.error }) }
             </AlertDescription>
           </Alert>
         )}
@@ -366,13 +365,13 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
       <div className="border border-border rounded-lg p-4 space-y-4">
         <h3 className="font-medium text-foreground dark:text-foreground flex items-center gap-2">
           <span className="text-xs bg-accent dark:bg-muted px-2 py-0.5 rounded">②</span>
-          {t('Cloudflare Vectorize 连接', 'Cloudflare Vectorize Connection')}
+          {t('vectorSearchSettings.cloudflare-vectorize-connection')}
         </h3>
 
         {/* Worker URL */}
         <div>
           <label htmlFor="vectorize-worker-url" className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground mb-1.5">
-            {t('Worker 地址', 'Worker URL')}
+            {t('vectorSearchSettings.worker-url')}
           </label>
           <Input
             id="vectorize-worker-url"
@@ -387,7 +386,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         {/* Auth Token */}
         <div>
           <label htmlFor="vectorize-auth-token" className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground mb-1.5">
-            {t('认证 Token', 'Auth Token')}
+            {t('vectorSearchSettings.auth-token')}
           </label>
           <div className="relative">
             <Input
@@ -395,13 +394,13 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
               type={showAuthToken ? 'text' : 'password'}
               value={formAuthToken}
               onChange={(e) => setFormAuthToken(e.target.value)}
-              placeholder={t('Worker 认证令牌', 'Worker authentication token')}
+              placeholder={t('vectorSearchSettings.worker-authentication-token')}
               className="w-full px-3 py-2 pr-12 text-base sm:pr-10 sm:text-sm border border-input rounded-md bg-card dark:bg-card text-foreground dark:text-foreground focus:ring-2 focus:ring-ring focus:border-transparent"
             />
             <Button
               type="button"
               variant="ghost"
-              aria-label={showAuthToken ? t('隐藏认证 Token', 'Hide auth token') : t('显示认证 Token', 'Show auth token')}
+              aria-label={showAuthToken ? t('vectorSearchSettings.hide-auth-token') : t('vectorSearchSettings.show-auth-token')}
               onClick={() => setShowAuthToken(!showAuthToken)}
               className="absolute right-1 top-1/2 h-11 w-11 -translate-y-1/2 p-0 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground sm:right-2 sm:h-8 sm:w-8"
             >
@@ -418,7 +417,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             className="w-full sm:w-auto flex items-center gap-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {testingWorker ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-            {t('测试 Worker 连接', 'Test Worker Connection')}
+            {t('vectorSearchSettings.test-worker-connection')}
           </Button>
         </div>
 
@@ -428,8 +427,8 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             {workerTestResult.success ? <CheckCircle className="h-4 w-4" aria-hidden="true" /> : <XCircle className="h-4 w-4" aria-hidden="true" />}
             <AlertDescription>
               {workerTestResult.success
-                ? `${t('连接成功', 'Connection successful')} — ${t('向量数', 'Vectors')}: ${workerTestResult.vectorCount}, ${t('维度', 'Dimensions')}: ${workerTestResult.dimensions}`
-                : `${t('连接失败', 'Connection failed')}: ${workerTestResult.error}`}
+                ? t('vectorSearchSettings.connection-successful-vectors', { vectorCount: workerTestResult.vectorCount, dimensions: workerTestResult.dimensions })
+                : t('vectorSearchSettings.connection-failed-detail', { error: workerTestResult.error }) }
             </AlertDescription>
           </Alert>
         )}
@@ -439,7 +438,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
       <div className="border border-border rounded-lg p-4 space-y-3">
         <h3 className="font-medium text-foreground dark:text-foreground flex items-center gap-2">
           <span className="text-xs bg-accent dark:bg-muted px-2 py-0.5 rounded">③</span>
-          {t('状态', 'Status')}
+          {t('vectorSearchSettings.status')}
         </h3>
 
         <div className="space-y-2 text-sm">
@@ -451,8 +450,8 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             )}
             <span className="text-muted-foreground dark:text-muted-foreground">
               {vectorSearchStatus?.connected
-                ? t('Worker 已连接', 'Worker connected')
-                : t('Worker 未连接', 'Worker not connected')}
+                ? t('vectorSearchSettings.worker-connected')
+                : t('vectorSearchSettings.worker-not-connected')}
             </span>
           </div>
 
@@ -460,7 +459,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-foreground" aria-hidden="true" />
               <span className="text-muted-foreground dark:text-muted-foreground">
-                {t('Embedding 模型', 'Embedding model')}: {activeConfig.model}
+                {t('vectorSearchSettings.embedding-model')}: {activeConfig.model}
               </span>
             </div>
           )}
@@ -469,7 +468,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">📊</span>
               <span className="text-muted-foreground dark:text-muted-foreground">
-                {t('索引向量数', 'Indexed vectors')}: {vectorSearchStatus.vectorCount.toLocaleString()}
+                {t('vectorSearchSettings.indexed-vectors')}: {vectorSearchStatus.vectorCount.toLocaleString()}
               </span>
             </div>
           )}
@@ -478,7 +477,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">📐</span>
               <span className="text-muted-foreground dark:text-muted-foreground">
-                {t('向量维度', 'Vector dimensions')}: {vectorSearchStatus.dimensions.toLocaleString()}
+                {t('vectorSearchSettings.vector-dimensions-2')}: {vectorSearchStatus.dimensions.toLocaleString()}
               </span>
             </div>
           )}
@@ -487,7 +486,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">🕐</span>
               <span className="text-muted-foreground dark:text-muted-foreground">
-                {t('最后同步', 'Last sync')}: {new Date(vectorSearchStatus.lastSyncAt).toLocaleString()}
+                {t('vectorSearchSettings.last-sync')}: {new Date(vectorSearchStatus.lastSyncAt).toLocaleString()}
               </span>
             </div>
           )}
@@ -498,13 +497,13 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
       <div className="border border-border rounded-lg p-4 space-y-4">
         <h3 className="font-medium text-foreground dark:text-foreground flex items-center gap-2">
           <span className="text-xs bg-accent dark:bg-muted px-2 py-0.5 rounded">④</span>
-          {t('索引管理', 'Index Management')}
+          {t('vectorSearchSettings.index-management')}
         </h3>
 
         {/* 索引内容选择 */}
         <div className="space-y-2">
           <h4 id="embedding-index-content-label" className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground">
-            {t('索引内容', 'Index Content')}
+            {t('vectorSearchSettings.index-content')}
           </h4>
           <div role="group" aria-labelledby="embedding-index-content-label" className="grid grid-cols-2 gap-2">
             <Button
@@ -518,10 +517,10 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
               }`}
             >
               <span className="block font-medium text-foreground dark:text-foreground">
-                {t('仓库描述', 'Description')}
+                {t('vectorSearchSettings.description')}
               </span>
               <span className="mt-1 block text-xs text-muted-foreground dark:text-muted-foreground">
-                {t('⚡ 速度快，精度较低', '⚡ Fast, lower precision')}
+                {t('vectorSearchSettings.fast-lower-precision')}
               </span>
             </Button>
             <Button
@@ -535,10 +534,10 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
               }`}
             >
               <span className="block font-medium text-foreground dark:text-foreground">
-                {t('README 内容', 'README Content')}
+                {t('vectorSearchSettings.readme-content')}
               </span>
               <span className="mt-1 block text-xs text-muted-foreground dark:text-muted-foreground">
-                {t('🎯 精度高，速度较慢', '🎯 High precision, slower')}
+                {t('vectorSearchSettings.high-precision-slower')}
               </span>
             </Button>
           </div>
@@ -548,7 +547,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         {formIndexMode === 'readme' && (
           <div className="space-y-1">
             <label htmlFor="readme-max-characters" className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground">
-              {t('README 截取字符数', 'README Max Characters')}
+              {t('vectorSearchSettings.readme-max-characters')}
             </label>
             <NumberInput
               id="readme-max-characters"
@@ -565,7 +564,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
               className="w-full text-base sm:text-sm"
             />
             <p className="text-xs text-muted-foreground dark:text-muted-foreground">
-              {t('建议 4000-8000，越长精度越高但索引越慢', 'Recommended 4000-8000. Longer = higher precision but slower indexing')}
+              {t('vectorSearchSettings.recommended-4000-8000-longer-higher-precision-bu')}
             </p>
           </div>
         )}
@@ -576,7 +575,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
           variant={workerSaved ? 'default' : 'outline'}
           className="h-11 w-full px-4 text-sm sm:h-9 sm:w-auto"
         >
-          {workerSaved ? `✓ ${t('已保存', 'Saved')}` : t('保存索引配置', 'Save Index Config')}
+          {workerSaved ? `✓ ${t('vectorSearchSettings.saved')}` : t('vectorSearchSettings.save-index-config')}
         </Button>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -586,7 +585,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             className="h-11 w-full sm:h-9 sm:w-auto flex items-center gap-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isIndexing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            {t('重建向量索引', 'Rebuild Vector Index')}
+            {t('vectorSearchSettings.rebuild-vector-index')}
           </Button>
           <Button
             onClick={handleIncrementalIndex}
@@ -594,7 +593,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             className="h-11 w-full sm:h-9 sm:w-auto flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm text-accent-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isIndexing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            {t('增量索引', 'Incremental Index')}
+            {t('vectorSearchSettings.incremental-index')}
             {incrementalTargetCount > 0 && (
               <Badge className="ml-1">{incrementalTargetCount}</Badge>
             )}
@@ -606,7 +605,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
               className="h-11 w-full gap-2 px-4 text-sm sm:h-9 sm:w-auto"
             >
               <Square className="w-4 h-4" />
-              {t('中止', 'Abort')}
+              {t('vectorSearchSettings.abort')}
             </Button>
           )}
         </div>
@@ -616,10 +615,10 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
           <div className="space-y-2">
             <div className="flex flex-wrap justify-between gap-2 text-sm text-muted-foreground dark:text-muted-foreground">
               <span>
-                {phase === 'readme' && `📖 ${t('获取 README', 'Fetching README')}`}
-                {phase === 'embedding' && `🧠 ${t('生成向量', 'Generating embeddings')}`}
-                {phase === 'uploading' && `☁️ ${t('上传向量', 'Uploading vectors')}`}
-                {!phase && `⏳ ${t('准备中', 'Preparing')}`}
+                {phase === 'readme' && `📖 ${t('vectorSearchSettings.fetching-readme')}`}
+                {phase === 'embedding' && `🧠 ${t('vectorSearchSettings.generating-embeddings')}`}
+                {phase === 'uploading' && `☁️ ${t('vectorSearchSettings.uploading-vectors')}`}
+                {!phase && `⏳ ${t('vectorSearchSettings.preparing')}`}
               </span>
               <span>
                 {phaseDone}/{phaseTotal} ({Math.round((phaseDone / phaseTotal) * 100)}%)
@@ -638,7 +637,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         {indexResult && (
           <Alert variant={indexResult.errors > 0 && indexResult.indexed === 0 ? 'destructive' : 'default'}>
             <AlertDescription>
-              {t('索引完成', 'Indexing complete')}: {indexResult.indexed} {t('已索引', 'indexed')}, {indexResult.skipped} {t('跳过', 'skipped')}, {indexResult.errors} {t('失败', 'errors')}
+              {t('vectorSearchSettings.indexing-complete')}: {indexResult.indexed} {t('vectorSearchSettings.indexed')}, {indexResult.skipped} {t('vectorSearchSettings.skipped')}, {indexResult.errors} {t('vectorSearchSettings.errors')}
               {indexResult.error && <div className="mt-1 text-xs">{indexResult.error}</div>}
             </AlertDescription>
           </Alert>
@@ -649,13 +648,13 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
       <div className="border border-border rounded-lg p-4 space-y-4">
         <h3 className="font-medium text-foreground dark:text-foreground flex items-center gap-2">
           <span className="text-xs bg-accent dark:bg-muted px-2 py-0.5 rounded">⑤</span>
-          {t('搜索参数', 'Search Parameters')}
+          {t('vectorSearchSettings.search-parameters')}
         </h3>
 
         {/* Similarity Threshold */}
         <div className="space-y-1">
           <div className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground">
-            {t('相似度阈值', 'Similarity Threshold')}
+            {t('vectorSearchSettings.similarity-threshold')}
           </div>
           <SliderInput
             value={formSearchThreshold}
@@ -663,19 +662,19 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             min={0.1}
             max={0.8}
             step={0.05}
-            label={t('相似度阈值', 'Similarity Threshold')}
+            label={t('vectorSearchSettings.similarity-threshold')}
             formatValue={(value) => value.toFixed(2)}
             showMarks={false}
           />
           <p className="text-xs text-muted-foreground dark:text-muted-foreground">
-            {t('越高越严格，结果越少但更精确；越低越宽松，召回更多但可能有噪音', 'Higher = stricter, fewer but more precise results; Lower = more recall but may include noise')}
+            {t('vectorSearchSettings.higher-stricter-fewer-but-more-precise-results-l')}
           </p>
         </div>
 
         {/* Top K */}
         <div className="space-y-1">
           <label htmlFor="search-topk" className="block text-sm font-medium text-muted-foreground dark:text-muted-foreground">
-            {t('返回结果数 (Top K)', 'Results Count (Top K)')}
+            {t('vectorSearchSettings.results-count-top-k')}
           </label>
           <NumberInput
             id="search-topk"
@@ -691,7 +690,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             className="w-full text-base sm:text-sm"
           />
           <p className="text-xs text-muted-foreground dark:text-muted-foreground">
-            {t('向量检索返回的最大结果数，越多召回越广但 LLM 重排序成本越高', 'Max results from vector search. More = wider recall but higher LLM reranking cost')}
+            {t('vectorSearchSettings.max-results-from-vector-search-more-wider-recall')}
           </p>
         </div>
 
@@ -699,16 +698,16 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         <div className="flex min-w-0 items-start gap-3 sm:items-center sm:justify-between">
           <div className="min-w-0">
             <div className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">
-              {t('HyDE 查询预处理', 'HyDE Query Preprocessing')}
+              {t('vectorSearchSettings.hyde-query-preprocessing')}
             </div>
             <p className="text-xs text-muted-foreground dark:text-muted-foreground">
-              {t('让 AI 生成理想仓库描述再搜索，提升短查询和中文查询的召回率', 'AI generates ideal repo description before searching, improves recall for short/Chinese queries')}
+              {t('vectorSearchSettings.ai-generates-ideal-repo-description-before-searc')}
             </p>
           </div>
           <Switch
             checked={formEnableHyDE}
             onCheckedChange={setFormEnableHyDE}
-            aria-label={t('HyDE 查询预处理', 'HyDE Query Preprocessing')}
+            aria-label={t('vectorSearchSettings.hyde-query-preprocessing')}
             className="shrink-0"
           />
         </div>
@@ -717,16 +716,16 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         <div className="flex min-w-0 items-start gap-3 sm:items-center sm:justify-between">
           <div className="min-w-0">
             <div className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">
-              {t('LLM 语义重排序', 'LLM Semantic Reranking')}
+              {t('vectorSearchSettings.llm-semantic-reranking')}
             </div>
             <p className="text-xs text-muted-foreground dark:text-muted-foreground">
-              {t('用 LLM 对向量搜索结果做语义排序，显著提升排序质量', 'LLM reranks vector results by semantic relevance, significantly improves ranking quality')}
+              {t('vectorSearchSettings.llm-reranks-vector-results-by-semantic-relevance')}
             </p>
           </div>
           <Switch
             checked={formEnableReranking}
             onCheckedChange={setFormEnableReranking}
-            aria-label={t('LLM 语义重排序', 'LLM Semantic Reranking')}
+            aria-label={t('vectorSearchSettings.llm-semantic-reranking')}
             className="shrink-0"
           />
         </div>
@@ -737,7 +736,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
           variant={workerSaved ? 'default' : 'outline'}
           className="h-11 w-full px-4 text-sm sm:h-9 sm:w-auto"
         >
-          {workerSaved ? `✓ ${t('已保存', 'Saved')}` : t('保存搜索参数', 'Save Search Parameters')}
+          {workerSaved ? `✓ ${t('vectorSearchSettings.saved')}` : t('vectorSearchSettings.save-search-parameters')}
         </Button>
       </div>
 
@@ -745,13 +744,10 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
       <div className="border border-border rounded-lg p-4 space-y-3">
         <h3 className="font-medium text-foreground dark:text-foreground flex items-center gap-2">
           <span className="text-xs bg-accent dark:bg-muted px-2 py-0.5 rounded">⑥</span>
-          {t('删除索引', 'Delete Index')}
+          {t('vectorSearchSettings.delete-index')}
         </h3>
         <p className="text-sm text-muted-foreground dark:text-muted-foreground">
-          {t(
-            '如果更换了 Embedding 模型（维度不同），需要删除旧索引后重新创建。',
-            'If you changed the Embedding model (different dimensions), you need to delete the old index and recreate it.'
-          )}
+          {t('vectorSearchSettings.if-you-changed-the-embedding-model-different-dim')}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
@@ -761,12 +757,12 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
                 await navigator.clipboard.writeText(cmd);
               } catch (error) {
                 console.warn('Failed to copy delete command:', error);
-                toast(t('复制删除命令失败', 'Failed to copy delete command'), 'error');
+                toast(t('vectorSearchSettings.failed-to-copy-delete-command'), 'error');
               }
             }}
             className="h-11 w-full rounded-md bg-accent px-4 py-2 text-sm text-accent-foreground hover:bg-muted hover:text-foreground sm:h-9 sm:w-auto"
           >
-            {t('复制删除命令', 'Copy Delete Command')}
+            {t('vectorSearchSettings.copy-delete-command')}
           </Button>
           <Button
             onClick={async () => {
@@ -775,16 +771,16 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
                 await navigator.clipboard.writeText(cmd);
               } catch (error) {
                 console.warn('Failed to copy create command:', error);
-                toast(t('复制创建命令失败', 'Failed to copy create command'), 'error');
+                toast(t('vectorSearchSettings.failed-to-copy-create-command'), 'error');
               }
             }}
             className="h-11 w-full rounded-md bg-accent px-4 py-2 text-sm text-accent-foreground hover:bg-muted hover:text-foreground sm:h-9 sm:w-auto"
           >
-            {t('复制创建命令', 'Copy Create Command')}
+            {t('vectorSearchSettings.copy-create-command')}
           </Button>
         </div>
         <p className="text-xs text-muted-foreground dark:text-muted-foreground">
-          {t('在 cloudflare-worker 目录下执行以上命令，然后点击上方「重建向量索引」', 'Run these commands in the cloudflare-worker directory, then click "Rebuild Vector Index" above')}
+          {t('vectorSearchSettings.run-these-commands-in-the-cloudflare-worker-dire')}
         </p>
       </div>
 
@@ -793,7 +789,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
         <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 p-4">
           <h3 className="font-medium text-foreground dark:text-foreground flex items-center gap-2">
             <span className="text-xs bg-accent dark:bg-muted px-2 py-0.5 rounded">⑦</span>
-            {t('部署指南', 'Deploy Guide')}
+            {t('vectorSearchSettings.deploy-guide')}
           </h3>
           <Button
             type="button"
@@ -802,7 +798,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             onClick={() => setShowDeployGuide(!showDeployGuide)}
             aria-expanded={showDeployGuide}
             aria-controls="vector-deploy-guide"
-            aria-label={t('切换部署指南', 'Toggle deploy guide')}
+            aria-label={t('vectorSearchSettings.toggle-deploy-guide')}
             className="h-11 w-11 shrink-0 p-0 sm:h-8 sm:w-8"
           >
             {showDeployGuide ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
@@ -813,12 +809,12 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             {/* 首次部署 */}
             <div className="p-3 bg-accent/50 dark:bg-card/50 rounded-md">
               <p className="font-medium text-foreground dark:text-foreground mb-2">
-                {t('首次部署', 'Initial Deployment')}
+                {t('vectorSearchSettings.initial-deployment')}
               </p>
               <ol className="list-decimal list-inside space-y-1.5">
                 <li>
                   <code className="bg-accent dark:bg-muted px-1.5 py-0.5 rounded text-xs">npm install -g wrangler</code>
-                  {t(' 然后 ', ' then ')}
+                  {t('vectorSearchSettings.then')}
                   <code className="bg-accent dark:bg-muted px-1.5 py-0.5 rounded text-xs">wrangler login</code>
                 </li>
                 <li>
@@ -841,7 +837,7 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
             {/* 更新部署 */}
             <div className="p-3 bg-accent/50 dark:bg-card/50 rounded-md">
               <p className="font-medium text-foreground dark:text-foreground mb-2">
-                {t('更新部署（代码变更后）', 'Redeploy (after code changes)')}
+                {t('vectorSearchSettings.redeploy-after-code-changes')}
               </p>
               <ol className="list-decimal list-inside space-y-1.5">
                 <li>
@@ -849,31 +845,28 @@ export const VectorSearchSettings: React.FC<VectorSearchSettingsProps> = ({ t })
                 </li>
                 <li>
                   <code className="bg-accent dark:bg-muted px-1.5 py-0.5 rounded text-xs">npm run deploy</code>
-                  {t('（如果依赖有变更，先执行 ', ' (if dependencies changed, run ')}
+                  {t('vectorSearchSettings.if-dependencies-changed-run')}
                   <code className="bg-accent dark:bg-muted px-1.5 py-0.5 rounded text-xs">npm install</code>
-                  {t('）', ')')}
+                  {t('vectorSearchSettings.text')}
                 </li>
               </ol>
               <p className="mt-2 text-xs text-muted-foreground">
-                {t('注意：更新部署不需要重新创建 Vectorize 索引，已有向量数据不受影响。', 'Note: Redeployment does not require recreating the Vectorize index. Existing vector data is preserved.')}
+                {t('vectorSearchSettings.note-redeployment-does-not-require-recreating-th')}
               </p>
             </div>
 
             {/* 模型变更警告 */}
             <div className="rounded-lg border border-border bg-muted/40 p-4 text-muted-foreground">
               <p className="font-medium text-foreground">
-                {t('更换 Embedding 模型后必须重建索引', 'Must rebuild index after changing Embedding model')}
+                {t('vectorSearchSettings.must-rebuild-index-after-changing-embedding-mode')}
               </p>
               <p className="mt-1 text-xs">
-                {t(
-                  '不同模型生成的向量维度不同，混用会导致查询失败。更换模型后需要：① 删除旧索引并创建新索引（维度需匹配） ② 点击下方「重建向量索引」',
-                  'Different models produce vectors with different dimensions. After changing model: ① Delete old index and create new one (dimensions must match) ② Click "Rebuild Vector Index" below'
-                )}
+                {t('vectorSearchSettings.different-models-produce-vectors-with-different')}
               </p>
             </div>
 
             <p className="text-xs text-muted-foreground dark:text-muted-foreground">
-              {t('详细部署指南请参考', 'For detailed instructions, see')}{' '}
+              {t('vectorSearchSettings.for-detailed-instructions-see')}{' '}
               <a
                 href="https://github.com/AmintaCCCP/GithubStarsManager/blob/main/cloudflare-worker/README.md"
                 target="_blank"

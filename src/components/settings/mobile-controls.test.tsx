@@ -12,9 +12,9 @@ describe('settings mobile controls', () => {
     expect(panel).toContain('className="min-w-0 flex-1"');
     expect(panel).toContain('h-11 w-11');
     expect(panel).toContain('sm:h-9 sm:w-9');
-    expect(panel).toContain('aria-label={t(\'测试连接\', \'Test Connection\')}');
-    expect(panel).toContain('aria-label={t(\'编辑\', \'Edit\')}');
-    expect(panel).toContain('aria-label={t(\'删除\', \'Delete\')}');
+    expect(panel).toContain("aria-label={t('aIConfigPanel.test-connection')}");
+    expect(panel).toContain("aria-label={t('aIConfigPanel.edit')}");
+    expect(panel).toContain("aria-label={t('aIConfigPanel.delete')}");
   });
 
   it('keeps category edit and reorder controls touch-safe and responsive', () => {
@@ -27,9 +27,9 @@ describe('settings mobile controls', () => {
     expect(panel).toContain('text-base sm:text-sm text-foreground dark:text-foreground');
     expect(panel).toContain('h-11 w-11');
     expect(panel).toContain('sm:h-8 sm:w-8');
-    expect(panel).toContain('aria-label={t(\'置顶\', \'Move to top\')}');
-    expect(panel).toContain('aria-label={t(\'编辑\', \'Edit\')}');
-    expect(panel).toContain('aria-label={t(\'删除\', \'Delete\')}');
+    expect(panel).toContain("aria-label={t('categoryPanel.move-to-top')}");
+    expect(panel).toContain("aria-label={t('categoryPanel.edit')}");
+    expect(panel).toContain("aria-label={t('categoryPanel.delete')}");
   });
 
   it('keeps network rows stackable and inputs legible on mobile', () => {

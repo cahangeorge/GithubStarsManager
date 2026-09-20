@@ -20,7 +20,7 @@ describe('mobile social settings modals', () => {
     expect(x).toContain('aria-label={showCt0 ?');
     expect(x).toContain('flex flex-col gap-2 sm:flex-row');
     expect(x).toContain('flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end');
-    expect(x).toContain('aria-label={t(`取消关注 @${follow.handle}`');
+    expect(x).toContain("aria-label={t('xTweetSettingsModal.unfollow-v1', { v1: follow.handle })}");
     expect(x).toContain('min-w-0 truncate');
   });
 
@@ -34,7 +34,7 @@ describe('mobile social settings modals', () => {
     expect(telegram).toContain('sm:text-sm');
     expect(telegram).toContain('h-11 w-11');
     expect(telegram).toContain('sm:h-8 sm:w-8');
-    expect(telegram).toContain('aria-label={t(`取消关注 @${follow.channel}`');
+    expect(telegram).toContain("aria-label={t('telegramSettingsModal.unfollow-v1', { v1: follow.channel })}");
     expect(telegram).toContain('min-w-0 truncate');
     expect(telegram).toContain('flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end');
   });

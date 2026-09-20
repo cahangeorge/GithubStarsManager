@@ -32,9 +32,9 @@ describe('diagnostic and MCP mobile settings', () => {
     expect(panel).toContain('h-11 w-11 p-2 rounded-lg hover:bg-accent dark:hover:bg-accent sm:h-8 sm:w-8');
     expect(panel).toContain('text-base sm:text-sm');
     expect(panel).toContain('overflow-x-auto');
-    expect(panel).toContain("aria-label={showToken ? t('隐藏', 'Hide') : t('显示', 'Show')}");
-    expect(panel).toContain("aria-label={t('复制 Token', 'Copy token')}");
-    expect(panel).toContain("aria-label={t('复制 Streamable HTTP 地址', 'Copy Streamable HTTP URL')}");
-    expect(panel).toContain("aria-label={t('复制 SSE 地址', 'Copy SSE URL')}");
+    expect(panel).toContain("aria-label={showToken ? t('mcpSettingsPanel.hide') : t('mcpSettingsPanel.show')}");
+    expect(panel).toContain("aria-label={t('mcpSettingsPanel.copy-token')}");
+    expect(panel).toContain("aria-label={t('mcpSettingsPanel.copy-streamable-http-url')}");
+    expect(panel).toContain("aria-label={t('mcpSettingsPanel.copy-sse-url')}");
   });
 });
