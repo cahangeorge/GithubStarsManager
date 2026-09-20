@@ -118,7 +118,7 @@ describe('SearchBar', () => {
       },
       setSearchFilters,
     });
-    mockUseAppStore.mockReturnValue(currentState as ReturnType<typeof useAppStore>);
+    mockUseAppStore.mockImplementation(((selector?: (state: unknown) => unknown) => (selector ? selector(currentState) : currentState)) as unknown as typeof useAppStore);
 
     render(<SearchBar />);
 
@@ -145,7 +145,7 @@ describe('SearchBar', () => {
     storeState.setSearchFilters = setSearchFilters;
 
     currentState = storeState;
-    mockUseAppStore.mockReturnValue(storeState as ReturnType<typeof useAppStore>);
+    mockUseAppStore.mockImplementation(((selector?: (state: typeof storeState) => unknown) => (selector ? selector(storeState) : storeState)) as unknown as typeof useAppStore);
 
     const { rerender } = render(<SearchBar />);
 
@@ -175,7 +175,7 @@ describe('SearchBar', () => {
       ],
       setSearchResults,
     });
-    mockUseAppStore.mockReturnValue(currentState as ReturnType<typeof useAppStore>);
+    mockUseAppStore.mockImplementation(((selector?: (state: unknown) => unknown) => (selector ? selector(currentState) : currentState)) as unknown as typeof useAppStore);
 
     try {
       render(<SearchBar />);
@@ -218,7 +218,7 @@ describe('SearchBar', () => {
       repositories,
       setSearchResults,
     });
-    mockUseAppStore.mockReturnValue(currentState as ReturnType<typeof useAppStore>);
+    mockUseAppStore.mockImplementation(((selector?: (state: unknown) => unknown) => (selector ? selector(currentState) : currentState)) as unknown as typeof useAppStore);
 
     try {
       render(<SearchBar />);
@@ -247,7 +247,7 @@ describe('SearchBar', () => {
     const repositories = [createRepository({ id: 1, name: 'react', full_name: 'facebook/react' })];
     localStorage.setItem('github-stars-search-history', JSON.stringify(['react']));
     currentState = createStoreState({ repositories, setSearchFilters, setSearchResults });
-    mockUseAppStore.mockReturnValue(currentState as ReturnType<typeof useAppStore>);
+    mockUseAppStore.mockImplementation(((selector?: (state: unknown) => unknown) => (selector ? selector(currentState) : currentState)) as unknown as typeof useAppStore);
 
     try {
       render(<SearchBar />);
@@ -271,7 +271,7 @@ describe('SearchBar', () => {
     vi.useFakeTimers();
     const repositories = [createRepository({ id: 1, language: 'TypeScript' })];
     currentState = createStoreState({ repositories });
-    mockUseAppStore.mockReturnValue(currentState as ReturnType<typeof useAppStore>);
+    mockUseAppStore.mockImplementation(((selector?: (state: unknown) => unknown) => (selector ? selector(currentState) : currentState)) as unknown as typeof useAppStore);
 
     try {
       render(<SearchBar />);
@@ -294,7 +294,7 @@ describe('SearchBar', () => {
     currentState = createStoreState({
       searchFilters: { ...defaultSearchFilters, query: 'react' },
     });
-    mockUseAppStore.mockReturnValue(currentState as ReturnType<typeof useAppStore>);
+    mockUseAppStore.mockImplementation(((selector?: (state: unknown) => unknown) => (selector ? selector(currentState) : currentState)) as unknown as typeof useAppStore);
 
     render(<SearchBar />);
 
@@ -329,7 +329,7 @@ describe('SearchBar', () => {
   it('keeps star presets touch-sized and applies their existing filter', () => {
     const setSearchFilters = vi.fn();
     currentState = createStoreState({ setSearchFilters });
-    mockUseAppStore.mockReturnValue(currentState as ReturnType<typeof useAppStore>);
+    mockUseAppStore.mockImplementation(((selector?: (state: unknown) => unknown) => (selector ? selector(currentState) : currentState)) as unknown as typeof useAppStore);
 
     render(<SearchBar />);
     fireEvent.click(screen.getByRole('button', { name: '过滤器' }));
@@ -343,7 +343,7 @@ describe('SearchBar', () => {
 
   it('dispatches the global history open event from the 问答历史 button', () => {
     currentState = createStoreState({});
-    mockUseAppStore.mockReturnValue(currentState as ReturnType<typeof useAppStore>);
+    mockUseAppStore.mockImplementation(((selector?: (state: unknown) => unknown) => (selector ? selector(currentState) : currentState)) as unknown as typeof useAppStore);
     const dispatchSpy = vi.fn();
     window.addEventListener('gsm:open-global-chat-history', dispatchSpy);
 
