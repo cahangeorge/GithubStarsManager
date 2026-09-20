@@ -1,3 +1,8 @@
+
+
+
+
+import { useT, useTPair } from '../i18n/useT';
 import { Textarea } from './ui/textarea';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -7,7 +12,6 @@ import { Plus, Trash2 } from 'lucide-react';
 import { Modal } from './Modal';
 import type { Gist } from '../types';
 import type { GistCreateInput, GistUpdateInput } from '../features/gists/hooks/useGistActions';
-import { useAppStore } from '../store/useAppStore';
 
 interface EditableFile {
   id: string;
@@ -39,8 +43,8 @@ const createEmptyFile = (): EditableFile => ({
 });
 
 export const GistEditorModal: React.FC<GistEditorModalProps> = ({ gist, isOpen, onClose, onSubmit }) => {
-  const language = useAppStore(state => state.language);
-  const t = (zh: string, en: string) => language === 'zh' ? zh : en;
+  const translate = useT('gists');
+  const t = useTPair();
   const [description, setDescription] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [files, setFiles] = useState<EditableFile[]>([createEmptyFile()]);
@@ -120,38 +124,38 @@ export const GistEditorModal: React.FC<GistEditorModalProps> = ({ gist, isOpen, 
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={gist ? t('编辑 Gist', 'Edit Gist') : t('新建 Gist', 'New Gist')}
+      title={gist ? translate('gistEditorModal.edit-gist') : translate('gistEditorModal.new-gist')}
       maxWidth="max-w-4xl"
     >
       <div className="space-y-5">
         <div className="space-y-2">
           <label htmlFor="gist-description" className="text-sm font-medium text-foreground dark:text-foreground">
-            {t('描述', 'Description')}
+            {translate('gistEditorModal.description')}
           </label>
           <Input
             id="gist-description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground outline-none transition-colors focus:border-primary dark:border-border dark:bg-muted/40 dark:text-foreground"
-            placeholder={t('这个 gist 是做什么的？', 'What is this gist for?')}
+            placeholder={translate('gistEditorModal.what-is-this-gist-for')}
           />
         </div>
 
         {!gist && (
           <div className="flex items-center gap-3 text-sm text-muted-foreground dark:text-muted-foreground">
-            <Checkbox id="gist-public" aria-label={t('公开 Gist', 'Public gist')} checked={isPublic} onCheckedChange={(checked) => setIsPublic(checked === true)} />
+            <Checkbox id="gist-public" aria-label={translate('gistEditorModal.public-gist')} checked={isPublic} onCheckedChange={(checked) => setIsPublic(checked === true)} />
             <label htmlFor="gist-public" className="cursor-pointer text-left">
-              {t('公开 Gist', 'Public gist')}
+              {translate('gistEditorModal.public-gist')}
             </label>
           </div>
         )}
 
         <div className="space-y-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-sm font-medium text-foreground dark:text-foreground">{t('文件', 'Files')}</div>
+            <div className="text-sm font-medium text-foreground dark:text-foreground">{translate('gistEditorModal.files')}</div>
             {hasDuplicateFilenames && (
               <div className="text-xs text-destructive">
-                {t('文件名不能重复', 'Filenames must be unique')}
+                {translate('gistEditorModal.filenames-must-be-unique')}
               </div>
             )}
             <Button
@@ -160,7 +164,7 @@ export const GistEditorModal: React.FC<GistEditorModalProps> = ({ gist, isOpen, 
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted dark:border-border dark:bg-muted/40 dark:text-muted-foreground dark:hover:bg-accent sm:w-auto"
             >
               <Plus className="h-4 w-4" />
-              {t('添加文件', 'Add file')}
+              {translate('gistEditorModal.add-file')}
             </Button>
           </div>
 
@@ -169,7 +173,7 @@ export const GistEditorModal: React.FC<GistEditorModalProps> = ({ gist, isOpen, 
               <div className="flex min-w-0 items-center gap-2">
                 <Input
                   id={`gist-file-name-${file.id}`}
-                  aria-label={t(`文件名 ${index + 1}`, `Filename ${index + 1}`)}
+                  aria-label={translate('gistEditorModal.filename-v1', { v1: index + 1 })}
                   value={file.filename}
                   onChange={(event) => updateFile(file.id, { filename: event.target.value })}
                   className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-base text-foreground outline-none focus:border-primary dark:border-border dark:bg-muted/40 dark:text-foreground sm:text-sm"
@@ -181,7 +185,7 @@ export const GistEditorModal: React.FC<GistEditorModalProps> = ({ gist, isOpen, 
                   onClick={() => removeFile(file.id)}
                   disabled={visibleFiles.length === 1}
                   className="h-11 w-11 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-40 dark:text-muted-foreground sm:h-auto sm:w-auto"
-                  title={t('删除文件', 'Delete file')}
+                  title={translate('gistEditorModal.delete-file')}
                   aria-label={t(`删除文件 ${index + 1}`, `Delete file ${index + 1}`)}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -189,12 +193,12 @@ export const GistEditorModal: React.FC<GistEditorModalProps> = ({ gist, isOpen, 
               </div>
               <Textarea
                 id={`gist-file-content-${file.id}`}
-                aria-label={t(`文件内容 ${index + 1}`, `File content ${index + 1}`)}
+                aria-label={translate('gistEditorModal.file-content-v1', { v1: index + 1 })}
                 value={file.content}
                 onChange={(event) => updateFile(file.id, { content: event.target.value })}
                 rows={8}
                 className="w-full resize-y rounded-lg border border-border bg-card px-3 py-2 font-mono text-base text-foreground outline-none focus:border-primary dark:border-border dark:bg-muted/40 dark:text-foreground sm:text-sm"
-                placeholder={t('输入文件内容', 'Enter file content')}
+                placeholder={translate('gistEditorModal.enter-file-content')}
               />
             </div>
           ))}
@@ -206,7 +210,7 @@ export const GistEditorModal: React.FC<GistEditorModalProps> = ({ gist, isOpen, 
             onClick={onClose}
             className="w-full rounded-lg border border-border bg-card px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted dark:border-border dark:bg-muted/40 dark:text-muted-foreground dark:hover:bg-accent sm:w-auto"
           >
-            {t('取消', 'Cancel')}
+            {translate('gistEditorModal.cancel')}
           </Button>
           <Button
             type="button"
@@ -214,7 +218,7 @@ export const GistEditorModal: React.FC<GistEditorModalProps> = ({ gist, isOpen, 
             disabled={!canSubmit || isSaving}
             className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
-            {isSaving ? t('保存中…', 'Saving…') : t('保存', 'Save')}
+            {isSaving ? translate('gistEditorModal.saving') : translate('gistEditorModal.save')}
           </Button>
         </div>
       </div>
