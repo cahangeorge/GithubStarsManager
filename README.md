@@ -18,6 +18,6 @@ Commands: `python3 -m unittest discover -s scripts -p 'test_*.py' -v`; manual ru
 
 Deployment activates only after environment `stars-production` contains `COOLIFY_API_URL` and `COOLIFY_TOKEN` and repository variable `OFFICIAL_AUTO_DEPLOY` is `true`. Until then, synchronization/build can be verified with manual input `deploy=false` and deployment remains disabled.
 
-Initial package creation uses manual input `first_build=true`; subsequent runs must use its default `false` to preserve reuse of immutable SHA-tagged images.
+The one-shot initial package bootstrap was retired after successful publication. All subsequent runs inspect and reuse immutable SHA-tagged images.
 
 Boundaries: preserve volumes, environment, API/encryption keys and unrelated local work; no application customizations, database reset, automatic rollback, or secret values in logs. Failures stop deployment and remain visible in GitHub Actions. GitHub schedules may be delayed or disabled after 60 days without repository activity; the sync job periodically refreshes this automation branch's activity to keep scheduling enabled.
