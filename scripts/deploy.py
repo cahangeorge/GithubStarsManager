@@ -10,7 +10,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-IMAGE = 'ghcr.io/cahangeorge/github-stars-manager-fullstack'
+IMAGE = 'ghcr.io/cahangeorge/github-stars-manager-official-fullstack'
+PREVIOUS_IMAGE = 'ghcr.io/cahangeorge/github-stars-manager-fullstack'
 SERVICE = 'vofdyllbdhlhpztexwtoqwss'
 COMPONENT = 'xruvvuahqotl2ksswt7wl1ko'
 HEALTH = 'https://stars.omnestack.com/api/health'
@@ -41,8 +42,9 @@ def request(method, url, body=None, token=None, missing_spa=False):
     except ValueError:
         raise Halt(method+' returned invalid JSON; body suppressed') from None
 
-def image(value):
-    if not isinstance(value,str) or not re.fullmatch(re.escape(IMAGE)+r'@sha256:[a-f0-9]{64}',value):
+def image(value, previous=False):
+    package = '(?:'+re.escape(IMAGE)+'|'+re.escape(PREVIOUS_IMAGE)+')' if previous else re.escape(IMAGE)
+    if not isinstance(value,str) or not re.fullmatch(package+r'@sha256:[a-f0-9]{64}',value):
         raise Halt('Expected fixed package and immutable image digest')
     return value
 
@@ -53,7 +55,7 @@ def component(service):
     return selected[0]
 
 def replace_image(raw, old, new):
-    image(old); image(new)
+    image(old,previous=True); image(new)
     if not isinstance(raw,str) or raw.count(old)!=1: raise Halt('Ambiguous saved Compose')
     lines = re.findall(r'(?m)^\s*image\s*:.*$',raw)
     scalar = '(?:'+re.escape(old)+"|'"+re.escape(old)+"'|\""+re.escape(old)+'")'
@@ -67,7 +69,7 @@ def deploy(desired, api, health, sleep=time.sleep, identity=None):
     path = '/services/'+SERVICE
     live = api('GET',path)
     app = component(live)
-    old = image(app.get('image'))
+    old = image(app.get('image'),previous=True)
     status = app.get('status')
     if old==desired and status=='running:healthy':
         if not health(): raise Halt('Unchanged healthy image; public probe failed, no mutation')

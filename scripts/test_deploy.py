@@ -31,6 +31,12 @@ class DeployTests(unittest.TestCase):
     def test_wrong_image_rejected(self):
         with self.assertRaises(deploy.Halt): deploy.image('ghcr.io/other/project@sha256:' + 'b'*64)
 
+    def test_initial_switch_accepts_only_the_fixed_legacy_package(self):
+        old=deploy.PREVIOUS_IMAGE+'@sha256:'+'a'*64
+        raw=RAW.replace(OLD,old)
+        self.assertEqual(deploy.replace_image(raw,old,NEW),raw.replace(old,NEW))
+        with self.assertRaises(deploy.Halt):deploy.image(old)
+
     def test_already_deployed_does_not_write(self):
         calls=[]
         def api(method, path, body=None):

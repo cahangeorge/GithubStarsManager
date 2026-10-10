@@ -9,6 +9,10 @@ on:
         description: Deploy after synchronization and image verification
         type: boolean
         default: true
+      first_build:
+        description: Create the dedicated official image on its first run
+        type: boolean
+        default: false
 
 permissions: {}
 concurrency:
@@ -16,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE: ghcr.io/cahangeorge/github-stars-manager-fullstack
+  IMAGE: ghcr.io/cahangeorge/github-stars-manager-official-fullstack
 
 jobs:
   sync:
@@ -74,6 +78,7 @@ jobs:
           password: ${{ github.token }}
       - name: Check previously built official commit
         id: existing
+        if: '!inputs.first_build'
         env:
           SOURCE_SHA: ${{ needs.sync.outputs.sha }}
         run: |
