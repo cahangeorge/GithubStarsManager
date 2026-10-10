@@ -84,7 +84,13 @@ jobs:
             [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
             echo "digest=$digest" >> "$GITHUB_OUTPUT"
           elif ! grep -Eq 'manifest unknown|MANIFEST_UNKNOWN|: not found' "$probe_error"; then
-            echo 'Registry probe failed; refusing to overwrite an existing SHA tag' >&2
+            if grep -Eiq 'denied|unauthorized|401|403|permission' "$probe_error"; then
+              echo 'Registry access denied for the fork Actions token; package access must be corrected' >&2
+            elif grep -Eiq 'timeout|deadline|connection|network|TLS|certificate' "$probe_error"; then
+              echo 'Registry network probe failed; refusing to overwrite a SHA tag' >&2
+            else
+              echo 'Registry probe failed with an unexpected response; refusing to overwrite a SHA tag' >&2
+            fi
             exit 1
           fi
       - name: Add build identity metadata without changing application code
