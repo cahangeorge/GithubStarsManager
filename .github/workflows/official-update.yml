@@ -83,7 +83,7 @@ jobs:
             digest=$(docker buildx imagetools inspect "$IMAGE:official-$SOURCE_SHA" --format '{{.Manifest.Digest}}')
             [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
             echo "digest=$digest" >> "$GITHUB_OUTPUT"
-          elif ! rg -q 'manifest unknown|MANIFEST_UNKNOWN|: not found' "$probe_error"; then
+          elif ! grep -Eq 'manifest unknown|MANIFEST_UNKNOWN|: not found' "$probe_error"; then
             echo 'Registry probe failed; refusing to overwrite an existing SHA tag' >&2
             exit 1
           fi
