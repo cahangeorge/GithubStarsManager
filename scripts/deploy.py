@@ -22,8 +22,8 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         raise Halt('HTTP redirect refused')
 
-def request(method, url, body=None, token=None):
-    headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+def request(method, url, body=None, token=None, missing_spa=False):
+    headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'stars-official-update/1'}
     if token: headers['Authorization'] = 'Bearer ' + token
     data = None if body is None else json.dumps(body).encode()
     try:
@@ -31,6 +31,8 @@ def request(method, url, body=None, token=None):
         with urllib.request.build_opener(NoRedirect()).open(req, timeout=30) as response:
             raw = response.read(4*1024*1024+1)
             if len(raw)>4*1024*1024: raise Halt('Response too large')
+            if missing_spa and response.headers.get('Content-Type','').startswith('text/html') and raw.lstrip().lower().startswith(b'<!doctype html>'):
+                return None  # Official SPA fallback when the static marker is absent.
             return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as error:
         raise Halt(method+' HTTP '+str(error.code)+'; response body suppressed') from None
@@ -106,7 +108,7 @@ def main():
         except Halt: return False
     def identity():
         url='https://stars.omnestack.com/__official_'+sha+'.json'
-        try:return request('GET',url)=={'upstream_sha':sha}
+        try:return request('GET',url,missing_spa=True)=={'upstream_sha':sha}
         except Halt as error:
             if str(error).startswith('GET HTTP 404;'):return False
             raise

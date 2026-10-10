@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import deploy
 
 OLD = deploy.IMAGE + '@sha256:' + 'a' * 64
@@ -11,6 +11,16 @@ def service(image=OLD, raw=RAW, status='running:healthy'):
             'applications': [{'uuid': deploy.COMPONENT, 'image': image, 'status': status}]}
 
 class DeployTests(unittest.TestCase):
+    def test_missing_marker_official_spa_shell_is_absent_not_network_failure(self):
+        response=MagicMock()
+        response.headers={'Content-Type':'text/html; charset=utf-8'}
+        response.read.return_value=b'<!doctype html>\n<html><head></head><body><div id="root"></div></body></html>'
+        response.__enter__.return_value=response
+        with patch('deploy.urllib.request.build_opener') as opener:
+            opener.return_value.open.return_value=response
+            self.assertIsNone(deploy.request('GET','https://stars.omnestack.com/__official_test.json',missing_spa=True))
+            with self.assertRaises(deploy.Halt):deploy.request('GET','https://stars.omnestack.com/api/health')
+
     def test_only_image_changes(self):
         self.assertEqual(deploy.replace_image(RAW, OLD, NEW), RAW.replace(OLD, NEW))
 
