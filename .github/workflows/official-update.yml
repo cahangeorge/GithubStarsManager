@@ -118,7 +118,7 @@ jobs:
 
   deploy:
     needs: [sync, build]
-    if: github.event_name == 'schedule' || inputs.deploy
+    if: (github.event_name == 'schedule' || inputs.deploy) && vars.OFFICIAL_AUTO_DEPLOY == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: stars-production
