@@ -34,7 +34,8 @@ jobs:
       - name: Keep hourly scheduling active
         if: github.event_name == 'schedule'
         run: |
-          if [ "$(date -u +%d%H)" = "0100" ]; then
+          age=$(( $(date -u +%s) - $(git log -1 --format=%ct) ))
+          if [ "$age" -gt 2592000 ]; then
             git -c user.name='Stars updater' -c user.email='stars-updater@users.noreply.github.com' commit --allow-empty -m 'Keep official update schedule active'
             git push origin HEAD:automation
           fi
@@ -76,11 +77,25 @@ jobs:
         env:
           SOURCE_SHA: ${{ needs.sync.outputs.sha }}
         run: |
-          if docker buildx imagetools inspect "$IMAGE:official-$SOURCE_SHA" >/dev/null 2>&1; then
+          probe_error=$(mktemp)
+          trap 'rm -f "$probe_error"' EXIT
+          if docker buildx imagetools inspect "$IMAGE:official-$SOURCE_SHA" >/dev/null 2>"$probe_error"; then
             digest=$(docker buildx imagetools inspect "$IMAGE:official-$SOURCE_SHA" --format '{{.Manifest.Digest}}')
             [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
             echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          elif ! rg -q 'manifest unknown|MANIFEST_UNKNOWN|: not found' "$probe_error"; then
+            echo 'Registry probe failed; refusing to overwrite an existing SHA tag' >&2
+            exit 1
           fi
+      - name: Add build identity metadata without changing application code
+        if: steps.existing.outputs.digest == ''
+        env:
+          SOURCE_SHA: ${{ needs.sync.outputs.sha }}
+        run: |
+          [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          marker="public/__official_$SOURCE_SHA.json"
+          test ! -e "$marker"
+          printf '{"upstream_sha":"%s"}\n' "$SOURCE_SHA" > "$marker"
       - name: Build official fullstack image
         id: build
         if: steps.existing.outputs.digest == ''
@@ -109,6 +124,7 @@ jobs:
           trap 'docker rm -f official-smoke >/dev/null 2>&1 || true' EXIT
           for attempt in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:3000/api/health | jq -e '.status == "ok"' >/dev/null; then
+              curl -fsS "http://127.0.0.1:3000/__official_$SOURCE_SHA.json" | jq -e --arg sha "$SOURCE_SHA" '. == {upstream_sha:$sha}' >/dev/null
               echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
               exit 0
             fi
@@ -137,4 +153,5 @@ jobs:
           COOLIFY_API_URL: ${{ secrets.COOLIFY_API_URL }}
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           DESIRED_IMAGE: ${{ env.IMAGE }}@${{ needs.build.outputs.digest }}
+          SOURCE_SHA: ${{ needs.sync.outputs.sha }}
         run: python3 -B scripts/deploy.py

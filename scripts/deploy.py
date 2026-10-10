@@ -32,8 +32,12 @@ def request(method, url, body=None, token=None):
             raw = response.read(4*1024*1024+1)
             if len(raw)>4*1024*1024: raise Halt('Response too large')
             return json.loads(raw) if raw else {}
-    except (urllib.error.URLError, http.client.HTTPException, ValueError, OSError):
-        raise Halt('HTTP operation failed; details suppressed') from None
+    except urllib.error.HTTPError as error:
+        raise Halt(method+' HTTP '+str(error.code)+'; response body suppressed') from None
+    except (urllib.error.URLError, http.client.HTTPException, OSError):
+        raise Halt(method+' network operation failed; details suppressed') from None
+    except ValueError:
+        raise Halt(method+' returned invalid JSON; body suppressed') from None
 
 def image(value):
     if not isinstance(value,str) or not re.fullmatch(re.escape(IMAGE)+r'@sha256:[a-f0-9]{64}',value):
@@ -55,16 +59,19 @@ def replace_image(raw, old, new):
         raise Halt('Unexpected image scalar')
     return raw.replace(old,new,1)
 
-def deploy(desired, api, health, sleep=time.sleep):
+def deploy(desired, api, health, sleep=time.sleep, identity=None):
     image(desired)
+    if identity is None: raise Halt('Runtime identity probe required')
     path = '/services/'+SERVICE
     live = api('GET',path)
     app = component(live)
     old = image(app.get('image'))
     status = app.get('status')
-    if old==desired and status=='running:healthy' and health():
-        print('Already running the official image; no deployment changes')
-        return
+    if old==desired and status=='running:healthy':
+        if not health(): raise Halt('Unchanged healthy image; public probe failed, no mutation')
+        if identity():
+            print('Already serving the official commit; no deployment changes')
+            return
     if status in ('running:healthy','running:unhealthy'): action='restart'
     elif status in ('exited','exited:unhealthy'): action='start'
     else: raise Halt('Service is transitional or unknown; no mutation')
@@ -79,7 +86,7 @@ def deploy(desired, api, health, sleep=time.sleep):
     for _ in range(60):
         sleep(10)
         current=component(api('GET',path))
-        if current.get('image')==desired and current.get('status')=='running:healthy' and health():
+        if current.get('image')==desired and current.get('status')=='running:healthy' and health() and identity():
             print('Official image deployed; Coolify and public API healthy')
             return
     raise Halt('Deployment health timeout; no automatic rollback')
@@ -91,11 +98,19 @@ def main():
         raise Halt('Expected HTTPS Coolify API base ending in /api/v1')
     token=os.environ.get('COOLIFY_TOKEN')
     if not token: raise Halt('Missing Coolify token')
+    sha=os.environ.get('SOURCE_SHA','')
+    if not re.fullmatch(r'[a-f0-9]{40}',sha): raise Halt('Invalid official commit SHA')
     def api(method,path,body=None): return request(method,base+path,body,token)
     def health():
         try: return request('GET',HEALTH).get('status')=='ok'
         except Halt: return False
-    deploy(os.environ.get('DESIRED_IMAGE'),api,health)
+    def identity():
+        url='https://stars.omnestack.com/__official_'+sha+'.json'
+        try:return request('GET',url)=={'upstream_sha':sha}
+        except Halt as error:
+            if str(error).startswith('GET HTTP 404;'):return False
+            raise
+    deploy(os.environ.get('DESIRED_IMAGE'),api,health,identity=identity)
 
 if __name__=='__main__':
     try: main()
